@@ -11,55 +11,72 @@ import {
   import { OrderRateExchange } from 'src/exchange-order/entities/order-rate-exchange.entity';
   import { User } from 'src/user/entities/user.entity';
   import { TransactionStatus } from 'src/common/enums';
+import { CryptoWallet } from 'src/crypto-wallet/entities/crypto-wallet.entity';
   
-  @Entity('exchange_transaction') // Table name if you prefer snake_case
+  @Entity('exchange_transactions')
   export class ExchangeTransaction {
     @PrimaryGeneratedColumn()
     id: number;
   
-    @ManyToOne(() => User, (user) => user.ownedExchangeTransactions)
+    @Column()
+    ownerId: number; // The user initiating the exchange
+  
+    @Column()
+    receiverId: number; // The user receiving the exchanged crypto
+  
+    @Column()
+    rateId: number; // The specific rate used from OrderRateExchange table
+
+    @Column()
+  orderId: number; // The ExchangeOrder this transaction is associated with
+  
+    @Column({ type: 'decimal', precision: 20, scale: 10 })
+    tradedPrimaryCryptoAmount: number;
+  
+    @Column({ type: 'decimal', precision: 20, scale: 10 })
+    tradedSecondaryCryptoAmount: number;
+  
+    @Column()
+    usedPrimaryCryptoWalletId: number;
+  
+    @Column()
+    usedSecondaryCryptoWalletId: number;
+  
+    @Column({ type: 'enum', enum: TransactionStatus, default : TransactionStatus.COMPLETED })
+    status: TransactionStatus;
+  
+    @CreateDateColumn({ type: 'timestamp'})
+    tradeTime: Date; // Corresponds to 'createdAt' for a transaction record
+  
+    @Column({ type: 'timestamp', nullable: true })
+    cryptoReleaseTime: Date;
+  
+    @Column({ type: 'timestamp', nullable: true })
+    completedTime: Date;
+  
+    // --- Relationships ---
+    @ManyToOne(() => User, user => user.ownedExchangeTransactions)
     @JoinColumn({ name: 'ownerId' })
     owner: User;
   
-    @Column()
-    ownerId: number; // Foreign key column
-  
-    @ManyToOne(() => User, (user) => user.receivedExchangeTransactions)
+    @ManyToOne(() => User, user => user.receivedExchangeTransactions)
     @JoinColumn({ name: 'receiverId' })
     receiver: User;
+
+    @ManyToOne(() => ExchangeOrder, exchangeOrder => exchangeOrder.id)
+      @JoinColumn({ name: 'orderId' })
+      order: ExchangeOrder;
+    
   
-    @Column()
-    receiverId: number; // Foreign key column
+    @ManyToOne(() => OrderRateExchange, orderRateExchange => orderRateExchange.transactions)
+    @JoinColumn({ name: 'rateId' })
+    rate: OrderRateExchange; // Assuming OrderRateExchange entity exists
   
-    @ManyToOne(() => ExchangeOrder, (order) => order.transactions)
-    @JoinColumn({ name: 'orderId' }) // Assuming 'order' in your code is FK to ExchangeOrder.id
-    order: ExchangeOrder;
+    @ManyToOne(() => CryptoWallet, cryptoWallet => cryptoWallet.exchangeTransactionsAsUsedPrimary)
+    @JoinColumn({ name: 'usedPrimaryCryptoWalletId' })
+    usedPrimaryCryptoWallet: CryptoWallet;
   
-    @Column()
-    orderId: number; // Foreign key column
-  
-    @ManyToOne(() => OrderRateExchange, (rate) => rate.transactions)
-    @JoinColumn({ name: 'rateId' }) // Assuming 'rate' in schema is FK to OrderRateExchange.id
-    rate: OrderRateExchange;
-  
-    @Column()
-    rateId: number; // Foreign key column
-  
-    @Column('decimal', { precision: 20, scale: 10 })
-    tradedPrimaryCryptoAmount: number; // Added from schema
-  
-    @Column('decimal', { precision: 20, scale: 10 })
-    tradedSecondaryCryptoAmount: number; // Added from schema
-  
-    @Column({ type: 'enum', enum: TransactionStatus })
-    status: TransactionStatus;
-  
-    @CreateDateColumn({ type: 'datetime' }) // Assuming tradeTime is creation time
-    tradeTime: Date; // Added from schema
-  
-    @Column({ type: 'datetime', nullable: true })
-    cryptoReleaseTime: Date; // Added from schema
-  
-    @Column({ type: 'datetime', nullable: true })
-    completedTime: Date; // Added from schema
+    @ManyToOne(() => CryptoWallet, cryptoWallet => cryptoWallet.exchangeTransactionsAsUsedSecondary)
+    @JoinColumn({ name: 'usedSecondaryCryptoWalletId' })
+    usedSecondaryCryptoWallet: CryptoWallet;
   }

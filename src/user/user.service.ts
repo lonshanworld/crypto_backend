@@ -40,19 +40,16 @@ export class UserService {
     return this.userRepository.save(newUser);
   }
 
-  /**
-   * Finds all users.
-   * @returns An array of user entities.
-   */
+
   async findAll(): Promise<User[]> {
     return this.userRepository.find();
   }
 
-  /**
-   * Finds a user by their ID.
-   * @param id The ID of the user.
-   * @returns The user entity, or null if not found.
-   */
+    /**
+     * Finds a user by their ID.
+     * @param id The ID of the user.
+     * @returns The user entity, or null if not found.
+     */
   async findOneById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {

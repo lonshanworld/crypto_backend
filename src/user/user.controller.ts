@@ -3,6 +3,7 @@ import { Controller, Get, Post, Body, Param, Delete, HttpCode, HttpStatus, UseGu
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'; // Import JwtAuthGuard
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UserController {
@@ -14,12 +15,14 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard) // Protect this endpoint with JWT
+  @ApiBearerAuth('JWT-auth')
   @Get()
   async findAll() {
     return this.userService.findAll();
   }
 
   @UseGuards(JwtAuthGuard) // Protect this endpoint
+  @ApiBearerAuth('JWT-auth')
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.userService.findOneById(+id);
@@ -27,6 +30,7 @@ export class UserController {
 
   // Add update and delete methods as needed, protected by JwtAuthGuard
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.NO_CONTENT) // 204 No Content for successful deletion
   @Delete(':id')
   async remove(@Param('id') id: string) {

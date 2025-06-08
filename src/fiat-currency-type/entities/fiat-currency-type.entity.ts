@@ -4,7 +4,7 @@ import { FiatWallet } from 'src/fiat-wallet/entities/fiat-wallet.entity';
 import { OrderRateTrade } from 'src/trade-order/entities/order-rate-trade.entity';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
 
-@Entity('fiat_currency_type') // Table name if you prefer snake_case
+@Entity('fiat_currency_type') 
 export class FiatCurrencyType {
   @PrimaryGeneratedColumn()
   id: number;

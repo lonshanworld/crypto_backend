@@ -61,6 +61,6 @@ import { InvoiceType } from 'src/common/enums';
     @Column({ nullable: true })
     fiatCurrencyId: number; // Foreign key column
   
-    @CreateDateColumn({ type: 'datetime' })
+    @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date; // Added from schema and corrected to be CreateDateColumn
   }

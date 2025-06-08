@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { runInitialSeed } from './seed/initial.seed';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,12 +20,27 @@ async function bootstrap() {
     }),
   );
 
-  // --- Seeding for Development (Optional, remove in production) ---
-  // Only run seeding if in development environment or a specific flag is set
-  if (configService.get<string>('NODE_ENV') !== 'production') {
-    const dataSource = app.get(DataSource); // Get the TypeORM DataSource
-    await runInitialSeed(dataSource); // Run the seed function
-    console.log('Development seeding complete.');
-  }
+  const config = new DocumentBuilder()
+    .setTitle('Crypto Wallet API') // Your API title
+    .setDescription('API documentation for managing crypto and fiat wallets, users, and orders.') // Your API description
+    .setVersion('1.0') // API version
+    .addBearerAuth( // Add Bearer token authentication option
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', name: 'JWT', description: 'Enter JWT token', in: 'header' },
+      'JWT-auth' // This name is used in the @ApiSecurity() decorator
+    )
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
+
+  const port = configService.get<number>('PORT') || 3000; // Example: get port from config
+  await app.listen(port);
+  const appUrl = await app.getUrl();
+  const displayUrl = appUrl.includes('[::1]')
+    ? `http://localhost:${port}` // Manually construct if IPv6 loopback is detected
+    : `${appUrl}`; // Otherwise, use the URL provided by app.getUrl()
+  
+  console.log(`Application is running on: ${displayUrl}/api`);
+  console.log(`Swagger UI available at: ${displayUrl}/swagger`);
 }
 bootstrap();

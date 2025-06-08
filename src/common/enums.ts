@@ -11,11 +11,12 @@ export enum OrderType {
   }
   
   export enum TransactionStatus {
-    PENDING = 'pending',
-    SUCCEED = 'succeed',
-    FAILED = 'failed',
+    PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING', 
+    COMPLETED = 'COMPLETED',
+    FAILED = 'FAILED',
+    REFUNDED = 'REFUNDED',
   }
-  
   export enum InvoiceType {
     TRADE = 'trade',
     EXCHANGE = 'exchange',

@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false, // Don't ignore token expiration
+      ignoreExpiration: true, 
       secretOrKey: jwtSecret, // Now TypeScript knows this is definitely a string
     });
   }

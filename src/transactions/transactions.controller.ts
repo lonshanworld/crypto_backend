@@ -1,20 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { CreateTradeTransactionDto } from './dto/create-trade-transaction.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { CreateExchangeTransactionDto } from './dto/create-exchange-transaction.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 @Controller('transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionsService.create(createTransactionDto);
+  @Post('trade')
+  createTrade(@Req() req : any,@Body() createTransactionDto: CreateTradeTransactionDto) {
+    return this.transactionsService.createTradeTransaction(req.user.id,createTransactionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.transactionsService.findAll();
+  @Post('exchange')
+  createExchange(@Req() req : any,@Body() createTransactionDto: CreateExchangeTransactionDto) {
+    return this.transactionsService.createExchangeTransaction(req.user.id,createTransactionDto);
+  }
+
+  @Get('getByUser')
+  findAll(@Req() req : any) {
+    return this.transactionsService.findAllByUserId(req.user.id);
   }
 
   @Get(':id')
@@ -22,13 +32,5 @@ export class TransactionsController {
     return this.transactionsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
-    return this.transactionsService.update(+id, updateTransactionDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.transactionsService.remove(+id);
-  }
 }

@@ -49,4 +49,6 @@ export class OrderRateExchange {
   // One-to-Many with ExchangeTransaction (transactions using this rate)
   @OneToMany(() => ExchangeTransaction, (transaction) => transaction.rate)
   transactions: ExchangeTransaction[];
+
+  
 }

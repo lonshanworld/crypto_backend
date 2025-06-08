@@ -14,7 +14,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerUserDto: CreateUserDto): Promise<User> {
+  async register(registerUserDto: CreateUserDto): Promise<any> {
     const { email, password, name } = registerUserDto;
     const existingUser = await this.userService.findOneByEmail(email);
     if (existingUser) {
@@ -26,8 +26,15 @@ export class AuthService {
       name,
     } as CreateUserDto
     );
-    // In a real app, you might trigger KYC workflow here
-    return newUser;
+
+    const { passwordHash, ...userWithoutPasswordHash } = newUser;
+
+    const token = await this.login({ email, password: registerUserDto.password }); // Reuse login method to generate token
+
+    return {
+      accessToken: token.access_token,
+    };
+
   }
 
   async validateUser(email: string, pass: string): Promise<any> {

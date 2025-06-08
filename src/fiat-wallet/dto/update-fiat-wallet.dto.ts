@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateFiatWalletDto } from './create-fiat-wallet.dto';
+import { IsPositive } from "class-validator";
 
-export class UpdateFiatWalletDto extends PartialType(CreateFiatWalletDto) {}
+export class UpdateFiatWalletBalanceDto {
+    walletId: number;
+    
+    @IsPositive()
+    reducedBalance: number;
+}

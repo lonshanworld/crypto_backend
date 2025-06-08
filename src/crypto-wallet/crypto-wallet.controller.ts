@@ -1,34 +1,50 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
 import { CryptoWalletService } from './crypto-wallet.service';
 import { CreateCryptoWalletDto } from './dto/create-crypto-wallet.dto';
-import { UpdateCryptoWalletDto } from './dto/update-crypto-wallet.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UpdateCryptoWalletBalanceDto } from './dto/update-crypto-wallet-balance.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 @Controller('crypto-wallet')
 export class CryptoWalletController {
   constructor(private readonly cryptoWalletService: CryptoWalletService) {}
 
+  
   @Post()
-  create(@Body() createCryptoWalletDto: CreateCryptoWalletDto) {
-    return this.cryptoWalletService.create(createCryptoWalletDto);
+  create(@Req() req: any,@Body() createCryptoWalletDto: CreateCryptoWalletDto) {
+    const userId = req.user['id'];
+    return this.cryptoWalletService.create(userId,createCryptoWalletDto);
   }
 
-  @Get()
-  findAll() {
-    return this.cryptoWalletService.findAll();
+  @Get('getAllCryptoWalletByUser')
+  findAll(@Req() req: any) {
+    const userId = req.user['id'];
+    return this.cryptoWalletService.findAllByUserId(userId);
   }
 
-  @Get(':id')
+  @Get('findByWalletId/:id')
   findOne(@Param('id') id: string) {
-    return this.cryptoWalletService.findOne(+id);
+    return this.cryptoWalletService.findByWalletId(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCryptoWalletDto: UpdateCryptoWalletDto) {
-    return this.cryptoWalletService.update(+id, updateCryptoWalletDto);
+  @Get('findByWalletNumber/:walletNumber')
+  findByWalletNumber(@Param('walletNumber') walletNumber: string) {
+    return this.cryptoWalletService.findByWalletNumber(walletNumber);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cryptoWalletService.remove(+id);
+
+
+  @Patch()
+  async update(@Req() req: any, @Body() updateDto: UpdateCryptoWalletBalanceDto) {
+    const userId = req.user['id'];
+    const wallet = await this.cryptoWalletService.findByWalletId(updateDto.walletId);
+    if(wallet.userId !== userId) {
+      throw new UnauthorizedException('You are not authorized to update this wallet');
+    }
+    return this.cryptoWalletService.updateCryptoWalletBalance(updateDto);
   }
+
+
 }

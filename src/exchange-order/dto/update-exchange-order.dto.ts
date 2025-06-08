@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateExchangeOrderDto } from './create-exchange-order.dto';
+import { IsNotEmpty } from "class-validator";
 
-export class UpdateExchangeOrderDto extends PartialType(CreateExchangeOrderDto) {}
+export class UpdateExchangeOrderDto {
+    @IsNotEmpty()
+    exchangeOrderId: number; // ID of the exchange order to update
+
+    @IsNotEmpty()
+    primaryCryptoAmount: number; // Amount of primary cryptocurrency to exchange
+    
+    @IsNotEmpty()
+    secondaryCryptoAmount: number; // Amount of secondary cryptocurrency to receive
+}

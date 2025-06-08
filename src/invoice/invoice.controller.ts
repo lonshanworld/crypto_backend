@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
-import { UpdateInvoiceDto } from './dto/update-invoice.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth('JWT-auth')
 @Controller('invoice')
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
-  @Post()
-  create(@Body() createInvoiceDto: CreateInvoiceDto) {
-    return this.invoiceService.create(createInvoiceDto);
-  }
+  
 
-  @Get()
-  findAll() {
-    return this.invoiceService.findAll();
+  @Get('ByUser')
+  findAll(@Req() req:any) {
+    return this.invoiceService.findAllByUserId(req.user.id);
   }
 
   @Get(':id')
@@ -22,13 +22,4 @@ export class InvoiceController {
     return this.invoiceService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInvoiceDto: UpdateInvoiceDto) {
-    return this.invoiceService.update(+id, updateInvoiceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.invoiceService.remove(+id);
-  }
-}
+} 
