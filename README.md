@@ -1,9 +1,9 @@
 # Project Setup Instructions
 
 ## Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+- Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
-Please change the environment values in .env file to align with your local setup
+- Please change the environment values in .env file to align with your local setup
 
 ---
 
