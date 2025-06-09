@@ -3,6 +3,8 @@
 ## Prerequisites
 Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
+Please change the environment values in .env file to align with your local setup
+
 ---
 
 ## Steps to Run the Project
